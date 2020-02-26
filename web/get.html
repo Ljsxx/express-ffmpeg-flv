@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    .demo-lis {
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: space-between;
+    }
+    .demo-item {
+      flex-grow: 1;
+      padding: 10px;
+    }
+    .demo-vdo {
+      width: 100%;
+      max-width: 880px;
+    }
+  </style>
+  <script type="text/javascript" src="./js/flv.js"></script>
+  <script src="../config.js"></script>
+</head>
+<body>
+  <h1>get请求 flv流直播</h1>
+  <div class="demo-lis" id="demo-wrap">
+  </div>
+</body>
+<script>
+  var player = {}
+  var lists = ipLists || []
+  // 加载元素
+  function loadLists () {
+    let wrap = document.getElementById('demo-wrap')
+    if (lists && lists.length) {
+      for (let i = 0; i < lists.length; i++) {
+        console.log('i', i)
+        let dom = `<div class="demo-item"><video class="demo-vdo" id="vdo-box-${i}" muted controls autoplay></video></div>`
+        wrap.innerHTML += dom
+        let url = `http://${host}:${port}/live/get/${i}`
+        setTimeout(() => {
+          // 隔开一段时间后再加载
+          loadFlv(i, url)
+        }, 1000 * (i + 1));
+      }
+    }
+    console.log('player', player)
+  }
+  // 加载视频
+  function loadFlv (index, url) {
+    if (flvjs.isSupported()) {
+        let video = document.getElementById('vdo-box-' + index)
+        if (video) {
+            player['p' + index] = flvjs.createPlayer({
+                type: "flv",
+                isLive: true,
+                // url: `ws://localhost:8888/rtsp/${this.id}/?url=${this.rtsp}`
+                url: url
+            });
+            player['p' + index].attachMediaElement(video);
+            try {
+                player['p' + index].load();
+                // player['p' + index].play();
+            } catch (error) {
+                console.log(error);
+            };
+        }
+    }
+  }
+  // 开始加载
+  loadLists()
+</script>
+</html>
